@@ -1,0 +1,75 @@
+<div class="mt-4 w-11/12 mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
+    @if (itemsFlag) {
+        @for (i of pedidos; track i.index){
+            <div class="grid gap-4">            
+                @for (j of i; track j.index){
+                    <div class="w-full rounded-t-lg text-white bg-yellow-200">
+    
+                        <div class="rounded-t-lg bg-gray-50 dark:bg-gray-600 flex items-center justify-between">
+                            <div class="p-5 w-max" fxLayout="row" fxLayoutAlign="start">
+                                <div class="font-bold uppercase">Mesa: {{j.mesa}}</div>    
+                                <div class="">Mesero: {{j.mesero}}</div>
+                            </div>
+                            <button class="material-symbols-outlined text-3xl mr-2" (click)="noteEdit = !noteEdit">{{noteEdit ? 'edit_off' : 'edit'}}</button>
+                        </div>
+                        
+                        <div class="text-black">
+                            @for (p of j.items; track p.id){
+                                <div class="leading-loose flex m-2 text-xl justify-between">
+                                    <div class="flex items-center">
+                                        <div *ngIf="noteEdit" class="flex flex-col">
+                                            <button class="material-symbols-outlined" (click)="itemCant(p,'+')"> arrow_drop_up </button>
+                                            <button class="material-symbols-outlined" (click)="itemCant(p,'-')"> arrow_drop_down  </button>
+                                        </div>
+                                        <p><span class="pr-2">{{p.cantidad}}</span>{{p.nombre}}</p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <p>${{p.precio*p.cantidad}}.00</p>
+                                        <span *ngIf="noteEdit" class="material-symbols-outlined ml-2">delete</span>
+                                    </div>
+                                </div>
+                                <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700">
+                            }
+                        </div>
+                    
+                    </div> 
+                }      
+            </div>
+        }
+    }@else {
+        @for (i of pedidos; track i.index){
+            <div class="grid gap-4">           
+                    <div class="w-full rounded-t-lg text-white bg-yellow-200">
+    
+                        <div class="rounded-t-lg bg-gray-50 dark:bg-gray-600 flex items-center justify-between">
+                            <div class="p-5 w-max" fxLayout="row" fxLayoutAlign="start">
+                                <div class="font-bold uppercase">Mesa: {{i.mesa}}</div>    
+                                <div class="">Mesero: {{i.mesero}}</div>
+                            </div>
+                            <button class="material-symbols-outlined text-3xl mr-2" (click)="noteEdit = !noteEdit">{{noteEdit ? 'edit_off' : 'edit'}}</button>
+                        </div>
+                        
+                        <div class="text-black">
+                            @for (p of i.items; track p.id){
+                                <div class="leading-loose flex m-2 text-xl justify-between">
+                                    <div class="flex items-center">
+                                        <div *ngIf="noteEdit" class="flex flex-col">
+                                            <button class="material-symbols-outlined" (click)="itemCant(p,'+')"> arrow_drop_up </button>
+                                            <button class="material-symbols-outlined" (click)="itemCant(p,'-')"> arrow_drop_down  </button>
+                                        </div>
+                                        <p><span class="pr-2">{{p.cantidad}}</span>{{p.nombre}}</p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <p>${{p.precio*p.cantidad}}.00</p>
+                                        <span *ngIf="noteEdit" class="material-symbols-outlined ml-2">delete</span>
+                                    </div>
+                                </div>
+                                <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700">
+                            }
+                        </div>
+                    
+                    </div> 
+            </div>
+        }
+    }
+</div>

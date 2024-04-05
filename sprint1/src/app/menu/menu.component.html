@@ -1,0 +1,220 @@
+
+<div class="flex flex-wrap flex-col w-11/12 mx-auto">
+    <!-- Action Bar -->
+    <div class="flex justify-end items-center pt-5">
+        <form *ngIf="edicion" class="md:w-1/12 w-3/12 relative">
+            <label for="underline_select" class="absolute text-lg text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">Mesa #</label>
+            <select id="underline_select" class="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-lg text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"  [formControl]="mesa" >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </form>
+        <button [ngClass]="edicion ? 'hidden' : ''" title="Nuevo Pedido" class="material-symbols-outlined text-6xl" (click)="edicion = true">add_notes</button>
+        <button [ngClass]="!edicion ? 'hidden' : ''" title="Ver/Editar Pedido" class="material-symbols-outlined text-6xl" type="button" (click)="noteModal = ! noteModal">other_admission</button>
+
+        <button *ngIf="edicion" title="Cancelar Pedido" class="material-symbols-outlined text-6xl text-red-600" (click)="alertModal = !alertModal">disabled_by_default</button>
+    </div>
+    <!-- Menu Section -->
+    <div class=" text-black dark:text-black">
+        <!-- Tab Selector -->
+        <ul class="flex mb-0 list-none flex-wrap justify-center pt-3 flex-row text-lg font-bold">
+            <li class="text-center">
+              <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(1)" 
+              [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 1, 
+              'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 1}">
+                Platillos
+              </a>
+            </li>
+            <li class="text-center">
+              <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(2)" 
+              [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 2, 
+              'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 2}">
+                Postres
+              </a>
+            </li>
+            <li class="text-center">
+              <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(3)" 
+              [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 3, 
+              'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 3}">
+                Bebidas
+              </a>
+            </li>
+        </ul>
+        <!-- Tab Content -->
+        <div class="relative flex flex-col min-w-0 break-words p-4 rounded-lg bg-gray-50 dark:bg-gray-800 w-full mb-6 shadow-lg px-4 py-5 flex-auto tab-content tab-space">
+            <!-- 'Platillos' Tab -->
+            <div [ngClass]="{'hidden': openTab !== 1, 'block': openTab === 1}" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                @for (i of tabSecc.divPla; track i.index){
+                    <div class="grid gap-4">
+                        @for (j of i; track j.id){
+                            <div (click)="setDetailModal(j.id)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg" [src]="j.imagen" alt="" /></a>
+                                <div class="p-5">
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.nombre}}</h5>
+                                    
+                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.descripcion}}</p>
+                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.precio}}</p>
+            
+                                    <div *ngIf="edicion" class="flex flex-col items-center">
+                                        <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'+','menu')">add</button>
+                                            {{j.cantidad}}
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'-','menu')">remove</button>
+                                        </div>
+                                        <button (click)="addItem(j)" type="button" class="mt-2 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Agregar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <!-- 'Postres' Tab -->
+            <div [ngClass]="{'hidden': openTab !== 2, 'block': openTab === 2}"class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                @for (i of tabSecc.divPos; track i.index){
+                    <div class="grid gap-4">
+                        @for (j of i; track j.id){
+                            <div (click)="setDetailModal(j.id)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg" [src]="j.imagen" alt="" /></a>
+                                <div class="p-5">
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.nombre}}</h5>
+                                    
+                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.descripcion}}</p>
+                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.precio}}</p>
+            
+                                    <div *ngIf="edicion" class="flex flex-col items-center">
+                                        <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'+','menu')">add</button>
+                                            {{j.cantidad}}
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'-','menu')">remove</button>
+                                        </div>
+                                        <button (click)="addItem(j)" type="button" class="mt-2 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Agregar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <!-- 'Bebidas' Tab -->
+            <div [ngClass]="{'hidden': openTab !== 3, 'block': openTab === 3}"class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                @for (i of tabSecc.divBeb; track i.index){
+                    <div class="grid gap-4">
+                        @for (j of i; track j.id){
+                            <div (click)="setDetailModal(j.id)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg" [src]="j.imagen" alt="" /></a>
+                                <div class="p-5">
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.nombre}}</h5>
+                                    
+                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.descripcion}}</p>
+                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.precio}}</p>
+            
+                                    <div *ngIf="edicion" class="flex flex-col items-center">
+                                        <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'+','menu')">add</button>
+                                            {{j.cantidad}}
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'-','menu')">remove</button>
+                                        </div>
+                                        <button (click)="addItem(j)" type="button" class="mt-2 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Agregar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+          </div>
+        </div>
+    </div>
+  </div>
+    
+
+<!-- Note modal  -->
+<div #modal *ngIf="noteModal" id="default-modal" tabindex="-1" aria-hidden="true" class="top-0 right-0 left-0 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full overflow-x-hidden overflow-y-auto fixed inset-0 outline-none focus:outline-none justify-center items-center flex" [ngClass]="alertModal ? 'z-30' : 'z-40'">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="w-full rounded-lg text-white bg-yellow-200">
+
+            <div class="rounded-t-lg bg-gray-50 dark:bg-gray-600 flex items-center justify-between">
+                <div class="p-5 w-max" fxLayout="row" fxLayoutAlign="start">
+                    <div class="font-bold uppercase">Mesa: {{mesa.value}}</div>    
+                    <div class="">Mesero: ""</div>
+                </div>
+                <div class="flex flex-col-reverse">
+                    <button (click)="noteEdit = !noteEdit" class="material-symbols-outlined text-3xl mr-2" [title]="!noteEdit ? 'Habilitar Edición' : 'Deshabilitar Edición'">{{noteEdit ? 'edit_off' : 'edit'}}</button>
+                    <button class="material-symbols-outlined mb-4" (click)="noteModal = !noteModal"> close</button>
+                </div>
+            </div>
+            
+            <div class="text-black">
+                @for (i of items; track i.id){
+                    <div class="leading-loose flex m-2 text-xl justify-between">
+                        <div class="flex items-center">
+                            <div *ngIf="noteEdit" class="flex flex-col">
+                                <button title="Aumentar" class="material-symbols-outlined" (click)="itemMod(i,'+','note')"> arrow_drop_up </button>
+                                <button title="Disminuir" class="material-symbols-outlined" (click)="itemMod(i,'-','note')"> arrow_drop_down  </button>
+                            </div>
+                            <p><span class="pr-2">{{i.cantidad}}</span>{{i.nombre}}</p>
+                        </div>
+                        <div class="flex items-center">
+                            <p>${{i.precio*i.cantidad}}.00</p>
+                            <button title="Eliminar" *ngIf="noteEdit" (click)="removeItem(i)" class="material-symbols-outlined ml-2">delete</button>
+                        </div>
+                    </div>
+                    <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700">
+                }
+            </div>
+
+            <div *ngIf="items.length > 0" class="rounded-b-lg bg-gray-50 dark:bg-gray-600 flex items-center justify-evenly p-3">
+                <button (click)="submit(); noteModal = !noteModal" type="button" class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Hacer Pedido</button>
+                <button (click)="alertModal = !alertModal" type="button" class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">Cancelar Pedido</button>
+            </div>
+        </div>
+    </div>
+</div>  
+
+<!-- Details Modal -->
+<div *ngIf="detailsModal" id="default-modal" tabindex="-1" aria-hidden="true" class="top-0 right-0 left-0 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full overflow-x-hidden overflow-y-auto fixed inset-0 z-40 outline-none focus:outline-none justify-center items-center flex">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="mx-auto max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+            <div class="relative">
+                <button class="material-symbols-outlined absolute text-black right-0 text-5xl closeBtn" (click)="detailsModal = !detailsModal"> close</button>
+                <img class="rounded-t-lg" [src]="d.imagen" alt="" />
+            </div>
+            <div class="p-5">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{d.nombre}}</h5>
+                
+                <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{d.receta}}</p>
+                <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{d.precio}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Alert Modal-->
+<div *ngIf="alertModal" id="default-modal" tabindex="-1" aria-hidden="true" class="top-0 right-0 left-0 w-full md:inset-0 h-[calc(100%-1rem)] max-h-full overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex">
+    <div class="relative p-4 w-full max-w-lg max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
+            <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
+                <svg (click)="alertModal = !alertModal" class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="p-4 md:p-5 text-center">
+                <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">¿Estas seguro de que quieres cancelar el pedido?</h3>
+                <button type="button" (click)="items = []; alertModal = !alertModal; noteModal = false; edicion = false" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Si, cancelar</button>
+                <button type="button" (click)="alertModal = !alertModal" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">No, regresar </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="noteModal || detailsModal ||alertModal" class="opacity-25 fixed inset-0 bg-black" [ngClass]="alertModal ? 'z-40' : 'z-30'"></div>
