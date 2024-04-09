@@ -1,0 +1,181 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<div class="min-h-screen flex items-start justify-center bg-gradient-to-br from-yellow-200 to-orange-300">
+  <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-4xl font-bold mb-4 text-center">CRUD</h1>
+    <h2 class="text-4xl font-bold mb-8 text-center">Restaurante Mexicano</h2>
+    <!-- Pestañas -->
+    <div class="">
+      <ul
+        class="flex flex-wrap justify-center -mb-px text-sm font-medium text-center text-orange-600 dark:text-orange-600">
+        <li class="me-2">
+          <a (click)="currentTab = 'products'"
+            [ngClass]="{'active-tab': currentTab === 'products', 'inactive-tab': currentTab !== 'products'}"
+            class="inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-orange-600 group">
+            <i
+              class="fas fa-utensils w-4 h-4 me-2 text-orange-600 group-hover:text-orange-800 dark:text-orange-600 dark:group-hover:text-orange-800"></i>Productos
+          </a>
+        </li>
+        <li class="me-2">
+          <a (click)="currentTab = 'users'"
+            [ngClass]="{'active-tab': currentTab === 'users', 'inactive-tab': currentTab !== 'users'}"
+            class="inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg text-orange-600 group">
+            <i class="fas fa-users w-4 h-4 me-2 text-orange-600 dark:group-hover:text-orange-800"></i>Usuarios
+          </a>
+        </li>
+        <li class="me-2">
+          <a (click)="currentTab = 'mesas'"
+            [ngClass]="{'active-tab': currentTab === 'mesas', 'inactive-tab': currentTab !== 'mesas'}"
+            class="inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-orange-600  group">
+            <i
+              class="fas fa-table w-4 h-4 me-2 text-orange-600  dark:text-orange-600 dark:group-hover:text-orange-800"></i>Mesas
+          </a>
+        </li>
+      </ul>
+    </div>
+
+
+    <!-- Contenido de las pestañas -->
+    <div class="p-4 bg-white rounded backdrop-blur-md backdrop-opacity-100 bg-opacity-25">
+      <div *ngIf="currentTab === 'mesas'">
+        <h2 class="text-2xl font-bold mb-4">Administrar Mesas</h2>
+        <!-- Botón para agregar una nueva mesa -->
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
+          (click)="crearMesa()">Agregar</button>
+        <!-- Contador de mesas actuales -->
+        <div class="mb-4">Total de Mesas: {{ mesas.length }}</div>
+        <!-- Tabla para listar las mesas -->
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ID
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Tamaño
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Número de Sillas
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Administrar
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let mesa of mesas">
+              <td class="px-6 py-4 whitespace-nowrap">{{ mesa.id }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ mesa['tamaño'] }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ mesa.numeroDeSillas }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex">
+                  <!-- Agregado botón para eliminar y editar mesa -->
+                  <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2"
+                    (click)="editarMesa(mesa)">Editar</button>
+                  <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    (click)="eliminarMesa(mesa)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="currentTab === 'products'">
+        <h2 class="text-2xl font-bold mb-4">Administrar Productos</h2>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+          (click)="crearProducto()">Crear</button>
+        <br>
+        <br>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ID
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Platillo
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Cantidad
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Calorias
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Administrar
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let product of products">
+              <td class="px-6 py-4 whitespace-nowrap">{{ product.id }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ product.platillo }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ product.cantidad }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ product.calorias }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex">
+
+                  <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2"
+                    (click)="editarProducto(product)">Editar</button>
+                  <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    (click)="eliminarProducto(product)">Eliminar</button>
+
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="currentTab === 'users'">
+        <h2 class="text-2xl font-bold mb-4">Administrar Usuarios</h2>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+          (click)="crearUsuario()">Crear</button>
+        <br>
+        <br>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                ID
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Nombre
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Edad
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Correo
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Contraseña
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Administrar
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let user of users">
+              <td class="px-6 py-4 whitespace-nowrap">{{ user.id }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ user.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ user.edad }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ user.correo }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ user.contrasenia }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex">
+
+                  <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2"
+                    (click)="editarUsuario(user)">Editar</button>
+                  <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    (click)="eliminarUsuario(user)">Eliminar</button>
+
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
