@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body{
-    background-color: rgb(213, 213, 246);
+    font-family: "Nanum Myeongjo", serif;
+    font-weight: 400;
+    font-style: normal;
+    font-optical-sizing: auto;
 }

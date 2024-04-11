@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Menu } from '../menu.model';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -32,7 +33,7 @@ export class MenuComponent {
   items : any[] = [];
   mesa:FormControl = new FormControl('1');
 
-  constructor() {
+  constructor(private activatedRoute: ActivatedRoute) {
     const divMenu = this.divideByCat(this.menu);
 
     this.tabSecc  = {
@@ -45,6 +46,17 @@ export class MenuComponent {
     this.tabSecc.divPos = this.balanceChunks(this.tabSecc.divPos);
     this.tabSecc.divBeb = this.balanceChunks(this.tabSecc.divBeb);
   }
+
+  ngOnInit(){    
+    document.getElementById('menu')?.scrollIntoView({behavior: 'smooth'});
+    /*this.activatedRoute.fragment.subscribe((value)=>{
+      this.jumpTo(value);
+    })*/
+  }
+
+  /*jumpTo(section:any){
+    document.getElementById(section)?.scrollIntoView({behavior: 'smooth'});
+  }*/
 
   divideByCat(arr:any){
     const res:any = {
@@ -135,6 +147,7 @@ export class MenuComponent {
 
   submit(){
     let pedido = {
+      id: 0,
       items: this.items,
       mesa: this.mesa.value,
       mesero: 'Mesero'

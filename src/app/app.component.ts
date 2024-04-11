@@ -18,26 +18,48 @@ export class AppComponent {
   title = 'sprint1';
  
   @ViewChild('pedidos') pedidos!: ElementRef;
-  
-  pedidoChk:boolean = false;
+  pedidoChk = 1;
+  //pedidoChk:boolean = false;
   tipoPedido:string = ''; 
 
   constructor(private route: Router, private location: Location) {
-    if(location.path() == '/cocina'){
-      this.pedidoChk = true;
+    /*if(location.path() == '/cocina'){
+      this.pedidoChk = 4;
       this.tipoPedido = 'cocina';
     }else if(location.path() == '/barra'){
-      this.pedidoChk = true;
+      this.pedidoChk = 4;
       this.tipoPedido = 'barra';
-    }
+    }else if(location.path() == '/menu'){
+      this.pedidoChk = 3;
+    }else if(location.path() == '/crud'){
+      this.pedidoChk = 2;
+    }else{
+      this.pedidoChk = 1;
+    }*/
   }
   
+  ngAfterContentChecked(){
+    if(this.location.path() == '/cocina'){
+      this.pedidoChk = 4;
+      this.tipoPedido = 'cocina';
+    }else if(this.location.path() == '/barra'){
+      this.pedidoChk = 4;
+      this.tipoPedido = 'barra';
+    }else if(this.location.path() == '/menu'){
+      this.pedidoChk = 3;
+    }else if(this.location.path() == '/crud'){
+      this.pedidoChk = 2;
+    }else{
+      this.pedidoChk = 1;
+    }
+  }
+
   ngOnInit(){
     initFlowbite();
   }
 
   pedidosClick(c:boolean){
-    this.pedidoChk = c;
+    //this.pedidoChk = c;
     this.tipoPedido = c ? this.tipoPedido : '';
   }
 
