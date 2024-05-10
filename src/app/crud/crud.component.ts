@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule, OnInit } from '@angular/core';
 import Swal from 'sweetalert2';
 import { Component } from '@angular/core';
+import { DbserviceService } from '../dbservice.service';
 
 @Component({
   selector: 'app-crud',
@@ -9,42 +10,80 @@ import { Component } from '@angular/core';
   styleUrls: ['./crud.component.css'],
 })
 export class CrudComponent implements OnInit {
-  constructor() {}
+  
+  currentTab: 'products' | 'users' | 'mesas' = 'products';
+
+  select = true;
+
+  mesas: any;
+  users: any;
+  products: any;
+  
+  constructor( private dbService : DbserviceService) {
+    this.getMesas();
+    this.getProductos();
+    this.getUsuarios();
+  }
+
+  getProductos(){
+    this.dbService.get('/getProductos').subscribe((response:any) => {
+      this.products = response['data'];
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    } 
+  }
+
+  getUsuarios(){
+    this.dbService.get('/getUsuarios').subscribe((response:any) => {
+      this.users = response['data'];
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    } 
+  }
+
+  getMesas(){
+    this.dbService.get('/getMesas').subscribe((response:any) => {
+      this.mesas = response['data'];
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    } 
+  }
 
   ngOnInit() {}
-
-  mesas: any[] = [
-    { id: 1, tamaño: 'Mediana', numeroDeSillas: 4 },
-    { id: 2, tamaño: 'Grande', numeroDeSillas: 6 },
-    // Agrega más mesas si es necesario
-  ];
 
   crearMesa() {
     Swal.fire({
       title: 'Agregar Mesa',
       html:
-        `<input id="swal-input1" class="swal2-input" placeholder="Tamaño">` +
-        `<input id="swal-input2" class="swal2-input" placeholder="Número de Sillas">`,
+      `<input type="number" id="swal-input1" class="swal2-input" placeholder="Numero de Mesa">` +
+      `<input type="number" id="swal-input2" class="swal2-input" placeholder="Capacidad">` +
+      `<br><select name="" id="swal-input3" class="swal2-select" placeholder="Estado">
+        <option value="0">Disponible</option>
+        <option value="1">Ocupada</option>
+      </select>`,
       showCancelButton: true,
       confirmButtonText: 'Agregar',
       cancelButtonText: 'Cancelar',
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        const tamaño = (
+        const Num_Mesa = (
           document.getElementById('swal-input1') as HTMLInputElement
         ).value;
-        const numeroDeSillas = (
+        const Capacidad = (
           document.getElementById('swal-input2') as HTMLInputElement
         ).value;
-        // Genera un nuevo ID dinámico para la mesa
-        const id =
-          this.mesas.length > 0 ? this.mesas[this.mesas.length - 1].id + 1 : 1;
-        // Crea el objeto de mesa
-        const nuevaMesa = { id, tamaño, numeroDeSillas };
+        const Estado = (
+          document.getElementById('swal-input3') as HTMLInputElement
+        ).value;
         // Agrega la nueva mesa al arreglo de mesas
-        this.mesas.push(nuevaMesa);
-        // Muestra un mensaje de éxito
-        Swal.fire('Agregada', 'La mesa ha sido agregada.', 'success');
+        this.dbService.post('/postMesa',{ Num_Mesa: Num_Mesa, Capacidad: Capacidad, Estado: Estado }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
+          Swal.fire('Agregada', 'La mesa ha sido agregada.', 'success');
+          this.getMesas();
+        }).catch((err)=>{
+           console.log(err);
+        }); 
       },
     });
   }
@@ -53,24 +92,35 @@ export class CrudComponent implements OnInit {
     Swal.fire({
       title: 'Editar Mesa',
       html:
-        `<input id="swal-input1" class="swal2-input" placeholder="Tamaño" value="${mesa.tamaño}">` +
-        `<input id="swal-input2" class="swal2-input" placeholder="Número de Sillas" value="${mesa.numeroDeSillas}">`,
+      `<input type="number" id="swal-input1" class="swal2-input" placeholder="Numero de Mesa" value="${mesa.Num_Mesa}">` +
+      `<input type="number" id="swal-input2" class="swal2-input" placeholder="Capacidad" value="${mesa.Capacidad}">` +
+      `<br><select name="" id="swal-input3" class="swal2-select" placeholder="Estado">
+        <option ${mesa.Estado == '0' ? "selected" : ""} value="0">Disponible</option>
+        <option ${mesa.Estado == '1' ? "selected" : ""} value="1">Ocupada</option>
+      </select>`, 
       showCancelButton: true,
       confirmButtonText: 'Guardar',
       cancelButtonText: 'Cancelar',
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        const tamaño = (
+        const Num_Mesa = (
           document.getElementById('swal-input1') as HTMLInputElement
         ).value;
-        const numeroDeSillas = (
+        const Capacidad = (
           document.getElementById('swal-input2') as HTMLInputElement
         ).value;
+        const Estado = (
+          document.getElementById('swal-input3') as HTMLInputElement
+        ).value;
         // Actualiza la mesa en el arreglo de mesas
-        mesa.tamaño = tamaño;
-        mesa.numeroDeSillas = numeroDeSillas;
-        // Muestra un mensaje de éxito
-        Swal.fire('Editada', 'La mesa ha sido editada.', 'success');
+        this.dbService.patch('/patchMesa',{ Num_Mesa: Num_Mesa, Capacidad: Capacidad, Estado: Estado, ID: mesa.ID }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
+          Swal.fire('Editada', 'La mesa ha sido editada.', 'success');
+          this.getMesas();
+        }).catch((err)=>{
+           console.log(err);
+        }); 
       },
     });
   }
@@ -87,11 +137,14 @@ export class CrudComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         // Elimina la mesa del arreglo de mesas
-        const index = this.mesas.indexOf(mesa);
-        if (index !== -1) {
-          this.mesas.splice(index, 1);
-        }
-        Swal.fire('Eliminada', 'La mesa ha sido eliminada.', 'success');
+        this.dbService.post('/deleteMesa',{ ID: mesa.ID }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
+          Swal.fire('Eliminada', 'La mesa ha sido eliminada.', 'success');
+          this.getMesas();
+        }).catch((err)=>{
+           console.log(err);
+        }); 
       }
     });
   }
@@ -100,31 +153,45 @@ export class CrudComponent implements OnInit {
     Swal.fire({
       title: 'Crear Producto',
       html:
-        `<input id="swal-input1" class="swal2-input" placeholder="Platillo">` +
-        `<input id="swal-input2" class="swal2-input" placeholder="Cantidad">` +
-        `<input id="swal-input3" class="swal2-input" placeholder="Calorías">`,
+      `<input id="swal-input1" class="swal2-input" type="text" placeholder="Nombre">
+      <textarea id="swal-input2" class="swal2-textarea" name="" id="" placeholder="Descripcion"></textarea>
+      <input id="swal-input3" class="swal2-input" type="text" placeholder="Imagen">
+      <input id="swal-input4" class="swal2-input" type="number" name="" id="" placeholder="Precio">
+      <select id="swal-input5" class="swal2-select" name="" id="">
+        <option value="1">Platillos</option>
+        <option value="2">Bebidas</option>
+        <option value="3">Bebidas con Alcohol</option>
+        <option value="4">Postres</option>
+        <option value="5">Entradas</option>
+      </select>`,
       showCancelButton: true,
       confirmButtonText: 'Crear',
       cancelButtonText: 'Cancelar',
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        const platillo = (
+        const Nombre = (
           document.getElementById('swal-input1') as HTMLInputElement
         ).value;
-        const cantidad = (
+        const Descripcion = (
           document.getElementById('swal-input2') as HTMLInputElement
         ).value;
-        const calorias = (
+        const Imagen = (
           document.getElementById('swal-input3') as HTMLInputElement
         ).value;
-        const id =
-          this.products.length > 0
-            ? this.products[this.products.length - 1].id + 1
-            : 1;
-        const nuevoProducto = { id, platillo, cantidad, calorias };
-        this.products.push(nuevoProducto);
-        console.log('Nuevo producto creado:', nuevoProducto);
+        const Precio = (
+          document.getElementById('swal-input4') as HTMLInputElement
+        ).value;
+        const ID_Categoria = (
+          document.getElementById('swal-input5') as HTMLInputElement
+        ).value;
+        this.dbService.post('/postProducto',{ Nombre: Nombre, Descripcion: Descripcion, Imagen: Imagen, Precio: Precio, ID_Categoria: ID_Categoria }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
         Swal.fire('Creado', 'El producto ha sido creado.', 'success');
+          this.getProductos();
+        }).catch((err)=>{
+           console.log(err);
+        });
       },
     });
   }
@@ -133,28 +200,45 @@ export class CrudComponent implements OnInit {
     Swal.fire({
       title: 'Editar Producto',
       html:
-        `<input id="swal-input1" class="swal2-input" placeholder="Platillo" value="${producto.platillo}">` +
-        `<input id="swal-input2" class="swal2-input" placeholder="Cantidad" value="${producto.cantidad}">` +
-        `<input id="swal-input3" class="swal2-input" placeholder="Calorías" value="${producto.calorias}">`,
+      `<input id="swal-input1" class="swal2-input" type="text" placeholder="Nombre" value="${producto.Nombre}">
+      <textarea id="swal-input2" class="swal2-textarea" name="" id="" placeholder="Descripcion">${producto.Descripcion}</textarea>
+      <input id="swal-input3" class="swal2-input" type="text" placeholder="Imagen" value="${producto.Imagen}">
+      <input id="swal-input4" class="swal2-input" type="number" name="" id="" placeholder="Precio" value="${producto.Precio}">
+      <select id="swal-input5" class="swal2-select" name="" id="">
+        <option ${producto.ID_Categoria == '1' ? "selected" : ""} value="1">Platillos</option>
+        <option ${producto.ID_Categoria == '2' ? "selected" : ""} value="2">Bebidas</option>
+        <option ${producto.ID_Categoria == '3' ? "selected" : ""} value="3">Bebidas con Alcohol</option>
+        <option ${producto.ID_Categoria == '4' ? "selected" : ""} value="4">Postres</option>
+        <option ${producto.ID_Categoria == '5' ? "selected" : ""} value="5">Entradas</option>
+      </select>`,
       showCancelButton: true,
       confirmButtonText: 'Guardar',
       cancelButtonText: 'Cancelar',
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        const platillo = (
+        const Nombre = (
           document.getElementById('swal-input1') as HTMLInputElement
         ).value;
-        const cantidad = (
+        const Descripcion = (
           document.getElementById('swal-input2') as HTMLInputElement
         ).value;
-        const calorias = (
+        const Imagen = (
           document.getElementById('swal-input3') as HTMLInputElement
         ).value;
-        producto.platillo = platillo;
-        producto.cantidad = cantidad;
-        producto.calorias = calorias;
-        console.log('Producto editado:', producto);
+        const Precio = (
+          document.getElementById('swal-input4') as HTMLInputElement
+        ).value;
+        const ID_Categoria = (
+          document.getElementById('swal-input5') as HTMLInputElement
+        ).value;
+        this.dbService.patch('/patchProducto',{ Nombre: Nombre, Descripcion: Descripcion, Imagen: Imagen, Precio: Precio, ID_Categoria: ID_Categoria, ID: producto.ID }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
         Swal.fire('Editado', 'El producto ha sido editado.', 'success');
+          this.getProductos();
+        }).catch((err)=>{
+           console.log(err);
+        });
       },
     });
   }
@@ -170,11 +254,14 @@ export class CrudComponent implements OnInit {
       confirmButtonText: 'Sí, eliminarlo',
     }).then((result) => {
       if (result.isConfirmed) {
-        const index = this.products.indexOf(producto);
-        if (index !== -1) {
-          this.products.splice(index, 1);
-        }
+        this.dbService.post('/deleteProducto',{ ID: producto.ID }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
         Swal.fire('Eliminado', 'El producto ha sido eliminado.', 'success');
+          this.getProductos();
+        }).catch((err)=>{
+           console.log(err);
+        });
       }
     });
   }
@@ -183,33 +270,51 @@ export class CrudComponent implements OnInit {
     Swal.fire({
       title: 'Crear Usuario',
       html:
-        `<input id="swal-input1" class="swal2-input" placeholder="Nombre">` +
-        `<input id="swal-input2" class="swal2-input" placeholder="Edad">` +
-        `<input id="swal-input3" class="swal2-input" placeholder="Correo">` +
-        `<input id="swal-input4" class="swal2-input" placeholder="Contraseña">`,
+      `<input id="swal-input1" class="swal2-input" type="text" placeholder="Nombre">
+      <input id="swal-input2" class="swal2-input" type="email" placeholder="Correo">
+      <input id="swal-input3" class="swal2-input" type="password" placeholder="Contraseña">
+      <input id="swal-input4" class="swal2-input" type="text" placeholder="Direccion">
+      <input id="swal-input5" class="swal2-select" type="number" placeholder="Telefono">
+      <select id="swal-input6" class="swal2-select">
+        <option value="1">Cocinero</option>
+        <option value="2">Chef</option>
+        <option value="3">Hostess</option>
+        <option value="4">Mesero</option>
+        <option value="5">Bartender</option>
+        <option value="6">Limpieza</option>
+        <option value="7">Capitan</option>
+      </select>`,
       showCancelButton: true,
       confirmButtonText: 'Crear',
       cancelButtonText: 'Cancelar',
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        const name = (
+        const Nombre = (
           document.getElementById('swal-input1') as HTMLInputElement
         ).value;
-        const edad = (
+        const Correo = (
           document.getElementById('swal-input2') as HTMLInputElement
         ).value;
-        const correo = (
+        const Contrasena = (
           document.getElementById('swal-input3') as HTMLInputElement
         ).value;
-        const contrasenia = (
+        const Direccion = (
           document.getElementById('swal-input4') as HTMLInputElement
         ).value;
-        const id =
-          this.users.length > 0 ? this.users[this.users.length - 1].id + 1 : 1;
-        const nuevoUsuario = { id, name, edad, correo, contrasenia };
-        this.users.push(nuevoUsuario);
-        console.log('Nuevo usuario creado:', nuevoUsuario);
-        Swal.fire('Creado', 'El usuario ha sido creado.', 'success');
+        const Telefono = (
+          document.getElementById('swal-input5') as HTMLInputElement
+        ).value
+        const ID_Puesto = (
+          document.getElementById('swal-input6') as HTMLInputElement
+        ).value;
+        this.dbService.post('/postUsuario',{ Nombre: Nombre, Correo: Correo, Contrasena: Contrasena, Direccion: Direccion, Telefono: Telefono, ID_Puesto: ID_Puesto }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
+          Swal.fire('Creado', 'El usuario ha sido creado.', 'success');
+          this.getUsuarios();
+        }).catch((err)=>{
+           console.log(err);
+        });
       },
     });
   }
@@ -218,33 +323,51 @@ export class CrudComponent implements OnInit {
     Swal.fire({
       title: 'Editar Usuario',
       html:
-        `<input id="swal-input1" class="swal2-input" placeholder="Nombre" value="${usuario.name}">` +
-        `<input id="swal-input2" class="swal2-input" placeholder="Edad" value="${usuario.edad}">` +
-        `<input id="swal-input3" class="swal2-input" placeholder="Correo" value="${usuario.correo}">` +
-        `<input id="swal-input4" class="swal2-input" placeholder="Contraseña" value="${usuario.contrasenia}">`,
+      `<input id="swal-input1" class="swal2-input" type="text" placeholder="Nombre" value="${usuario.Nombre}">
+      <input id="swal-input2" class="swal2-input" type="email" placeholder="Correo" value="${usuario.Correo}">
+      <input id="swal-input3" class="swal2-input" type="password" placeholder="Contraseña" value="${usuario.Contrasena}">
+      <input id="swal-input4" class="swal2-input" type="text" placeholder="Direccion" value="${usuario.Direccion}">
+      <input id="swal-input5" class="swal2-select" type="number" placeholder="Telefono" value="${usuario.Telefono}">
+      <select id="swal-input6" class="swal2-select">
+        <option ${usuario.ID_Puesto == '1' ? "selected" : ""} value="1">Cocinero</option>
+        <option ${usuario.ID_Puesto == '2' ? "selected" : ""} value="2">Chef</option>
+        <option ${usuario.ID_Puesto == '3' ? "selected" : ""} value="3">Hostess</option>
+        <option ${usuario.ID_Puesto == '4' ? "selected" : ""} value="4">Mesero</option>
+        <option ${usuario.ID_Puesto == '5' ? "selected" : ""} value="5">Bartender</option>
+        <option ${usuario.ID_Puesto == '6' ? "selected" : ""} value="6">Limpieza</option>
+        <option ${usuario.ID_Puesto == '7' ? "selected" : ""} value="7">Capitan</option>
+      </select>`,
       showCancelButton: true,
       confirmButtonText: 'Guardar',
       cancelButtonText: 'Cancelar',
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        const name = (
+        const Nombre = (
           document.getElementById('swal-input1') as HTMLInputElement
         ).value;
-        const edad = (
+        const Correo = (
           document.getElementById('swal-input2') as HTMLInputElement
         ).value;
-        const correo = (
+        const Contrasena = (
           document.getElementById('swal-input3') as HTMLInputElement
         ).value;
-        const contrasenia = (
+        const Direccion = (
           document.getElementById('swal-input4') as HTMLInputElement
         ).value;
-        usuario.name = name;
-        usuario.edad = edad;
-        usuario.correo = correo;
-        usuario.contrasenia = contrasenia;
-        console.log('Usuario editado:', usuario);
-        Swal.fire('Editado', 'El usuario ha sido editado.', 'success');
+        const Telefono = (
+          document.getElementById('swal-input5') as HTMLInputElement
+        ).value
+        const ID_Puesto = (
+          document.getElementById('swal-input6') as HTMLInputElement
+        ).value;
+        this.dbService.patch('/patchUsuario',{ Nombre: Nombre, Correo: Correo, Contrasena: Contrasena, Direccion: Direccion, Telefono: Telefono, ID_Puesto: ID_Puesto, ID: usuario.ID }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
+          Swal.fire('Editado', 'El usuario ha sido editado.', 'success');
+          this.getUsuarios();
+        }).catch((err)=>{
+           console.log(err);
+        });
       },
     });
   }
@@ -260,47 +383,17 @@ export class CrudComponent implements OnInit {
       confirmButtonText: 'Sí, eliminarlo',
     }).then((result) => {
       if (result.isConfirmed) {
-        const index = this.users.indexOf(usuario);
-        if (index !== -1) {
-          this.users.splice(index, 1);
-        }
+        this.dbService.post('/deleteUsuario',{ ID: usuario.ID }).then((data:any)=>{
+          console.log(data);
+          // Muestra un mensaje de éxito
         Swal.fire('Eliminado', 'El usuario ha sido eliminado.', 'success');
+          this.getUsuarios();
+        }).catch((err)=>{
+           console.log(err);
+        });
       }
     });
   }
-
-  currentTab: 'products' | 'users' | 'mesas' = 'products';
-
-  users: any[] = [
-    {
-      id: 1,
-      name: 'John Doe',
-      edad: 30,
-      correo: 'john@example.com',
-      contrasenia: '123456',
-    },
-    {
-      id: 2,
-      name: 'Jane Doe',
-      edad: 25,
-      correo: 'jane@example.com',
-      contrasenia: 'password',
-    },
-    {
-      id: 3,
-      name: 'Test',
-      edad: 22,
-      correo: 'test@example.com',
-      contrasenia: 'qwerty',
-    },
-    // Agrega más usuarios si es necesario
-  ];
-
-  products: any[] = [
-    { id: 1, platillo: 'Taco', cantidad: 2, calorias: 150 },
-    { id: 2, platillo: 'Burrito', cantidad: 1, calorias: 300 },
-    // Agrega más productos si es necesario
-  ];
 }
 
 @NgModule({

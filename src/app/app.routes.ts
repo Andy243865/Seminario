@@ -4,6 +4,7 @@ import { CocinaComponent } from './cocina/cocina.component';
 import { BarraComponent } from './barra/barra.component';
 import { CrudComponent } from './crud/crud.component';
 import { InicioComponent } from './inicio/inicio.component';
+import { MesasComponent } from './mesas/mesas.component';
 
 export const routes: Routes = [
   { path: 'inicio', component: InicioComponent },
@@ -11,6 +12,7 @@ export const routes: Routes = [
   { path: 'cocina', component: CocinaComponent },
   { path: 'barra', component: BarraComponent },
   { path: 'crud', component: CrudComponent },
+  { path: 'mesas', component: MesasComponent },
   { path: '**', redirectTo: '/inicio' },
   { path: '', redirectTo: '/inicio', pathMatch: 'full' },
 ];

@@ -1,8 +1,15 @@
 .active-tab {
-  background-color: #ffffff40;
-  color: rgb(234 88 12);
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  color: rgb(0, 0, 0);
 }
 
 .inactive-tab {
   background-color: transparent;
+}
+
+/* Estilos para la tabla con efecto de fondo */
+.table-with-background {
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
 }

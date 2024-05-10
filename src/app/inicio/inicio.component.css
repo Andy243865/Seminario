@@ -16,16 +16,18 @@
   }
   .text1{
     color: rgb(255, 255, 255);
-    font-size: 70px;
+    font-size: 7.5rem;
     font-weight: 700;
     letter-spacing: 8px;
     margin-bottom: 20px;
     position: relative;
     animation: text 5.5s 1;
+    -webkit-text-stroke: 0.25px black;
   }
   .text2{
-    font-size: 20px;
-    color: gray;
+    font-size: 3rem;
+    color: black;
+    -webkit-text-stroke: 0.25px white;
   }
   @keyframes text {
     0%{
@@ -75,11 +77,18 @@
     overflow: hidden;
     text-align: left;
   }
-  
+
+  .carrusel{
+    width: 666px;
+    aspect-ratio: auto 666 / 444;
+    height: 444px;
+  }
+
   .imagenes{
     height: 500px;
     width: 100%;
   }
+
   .carrusel-elemento {
     float: left;
     width: 33.333%;

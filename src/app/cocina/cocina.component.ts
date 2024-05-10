@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DbserviceService } from '../dbservice.service';
 
 @Component({
   selector: 'app-cocina',
@@ -11,11 +12,105 @@ import { ReactiveFormsModule } from '@angular/forms';
 })
 export class CocinaComponent {
   noteEdit = false;
-  itemsFlag:boolean;
-  pedidos:any[];
+  itemsFlag = false;
+  pedidos:any = [];
+  detalles:any;
+  users:any;
+  mesas:any;
+  categorias:any;
+  products:any;
 
-  constructor(){
-    this.pedidos = this.divideByCat(JSON.parse(localStorage.getItem('pedidos') || '[]'));
+  constructor(private dbService : DbserviceService) {
+    this.getDetalles();
+    this.getUsuarios();
+    this.getMesas();    
+    this.getProductos();
+    this.getCategorias();
+  }    
+
+  getCategorias(){
+    this.dbService.get('/getCategorias').subscribe((response:any) => {
+      this.categorias = response['data'];
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    } 
+  }
+
+  getProductos(){
+    this.dbService.get('/getProductos').subscribe((response:any) => {
+      this.products = response['data'];
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    } 
+  }
+
+  getUsuarios(){
+    this.dbService.get('/getUsuarios').subscribe((response:any) => {
+      this.users = response['data'];
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    } 
+  }
+
+  getMesas(){
+    this.dbService.get('/getMesas').subscribe((response:any) => {
+      this.mesas = response['data'];
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    } 
+  }
+
+  getPedidos(){
+    this.dbService.get('/getPedidos').subscribe((response:any) => {
+      this.prepPedidos(response['data']);
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    }
+  }
+
+  getDetalles(){
+    this.dbService.get('/getDetalles').subscribe((response:any) => {
+      this.detalles = response['data'];
+      this.getPedidos();
+    }), (error:any) =>{
+      console.log('Error is ',error);
+    }
+  }
+
+  prepPedidos(res:any){ 
+
+    for(let i of res){
+      let items:any = [];
+      for(let j of this.detalles){
+        if(i.ID == j.ID_Pedido){
+          let it = {
+            ID_Producto: j.ID_Producto,
+            Nombre: this.products[this.products.findIndex((k:any) => k.ID === j.ID_Producto)].Nombre,
+            Cantidad: j.Cantidad,
+            Precio_Unitario: j.Precio_Unitario,
+            Subtotal: j.Subtotal,
+            Tipo: this.categorias[this.categorias.findIndex((k1:any) => k1.ID ===
+              this.products[this.products.findIndex((k2:any) => k2.ID === j.ID_Producto)].ID_Categoria)].Tipo
+          }
+          items.push(it);
+        }
+      }
+      
+      let p = {
+        ID: i.ID,
+        ID_Usuario: i.ID_Usuario,
+        Usuario: this.users[this.users.findIndex((k:any) => k.ID === i.ID_Usuario)].Nombre,
+        ID_Mesa: i.ID_Mesa,
+        Num_Mesa: this.mesas[this.mesas.findIndex((k:any) => k.ID === i.ID_Mesa)].Num_Mesa,
+        items: items,
+        Estado: i.Estado,
+        noteEdit: false
+      }
+      this.pedidos.push(p);
+    }
+    console.log(this.pedidos);
+
+    this.pedidos = this.divideByCat(this.pedidos);
     if(this.pedidos.length > 3){
       this.itemsFlag = true;
       this.pedidos = this.balanceChunks(this.sliceIntoChunks(this.pedidos, Math.floor(this.pedidos.length/4)));
@@ -28,7 +123,6 @@ export class CocinaComponent {
       }
       this.pedidos = temp;
     }
-
   }
 
   divideByCat(arr:any){
@@ -37,7 +131,7 @@ export class CocinaComponent {
     for(let i of arr){    
       const index:any = [];
       for(let j of i.items){
-        j.tipo === 'Bebida' ? index.push(i.items.findIndex((k:any) => k === j)) : console.log("No hay bebida");
+        j.Tipo === 'Bebida' ? index.push(i.items.findIndex((k:any) => k === j)) : console.log("No hay bebida");
       }
       index.reverse();
       for(let j of index){
@@ -76,8 +170,36 @@ export class CocinaComponent {
 
   itemCant(i:any, op:string){
     switch(op){
-      case '+': i.cantidad++; break;
-      case '-': i.cantidad > 1 ? i.cantidad-- : i.cantidad; break;
+      case '+': i.Cantidad++; break;
+      case '-': i.Cantidad > 1 ? i.Cantidad-- : i.Cantidad; break;
     }
+  }
+
+  updatePedido(i:any){
+    if(i.noteEdit){
+      for(let j of i.items){
+        this.dbService.patch('/patchDetalles',{ ID_Pedido: i.ID, ID_Producto: j.ID_Producto, Cantidad: j.Cantidad, Subtotal: j.Cantidad*j.Precio_Unitario }).then((data:any)=>{
+          console.log(data);
+          i.noteEdit = false;
+        }).catch((err)=>{
+           console.log(err);
+        }); 
+      }
+    }else{
+      console.log("Activando edicion")
+      i.noteEdit = !i.noteEdit
+    }
+  }
+
+  deleteProducto(i:any, p:any){
+    //console.log("Borrando item: ", i.ID, p.ID_Producto);
+    
+    this.dbService.post('/deleteDetalle',{ ID_Pedido: i.ID, ID_Producto: p.ID_Producto }).then((data:any)=>{
+      console.log(data);
+      this.pedidos = [];
+      this.getDetalles();
+    }).catch((err)=>{
+       console.log(err);
+    }); 
   }
 }

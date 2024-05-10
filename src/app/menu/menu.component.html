@@ -5,11 +5,9 @@
         <form *ngIf="edicion" class="md:w-1/12 w-3/12 relative">
             <label for="underline_select" class="absolute text-lg text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] start-2.5 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto">Mesa #</label>
             <select id="underline_select" class="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-lg text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"  [formControl]="mesa" >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
+                @for (i of mesas; track i){
+                    <option [value]="i.ID">{{i.Num_Mesa}}</option>
+                }
             </select>
         </form>
         <button [ngClass]="edicion ? 'hidden' : ''" title="Nuevo Pedido" class="material-symbols-outlined text-6xl" (click)="edicion = true">add_notes</button>
@@ -25,38 +23,79 @@
               <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(1)" 
               [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 1, 
               'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 1}">
-                Platillos
+                Entradas
               </a>
             </li>
             <li class="text-center">
               <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(2)" 
               [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 2, 
               'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 2}">
-                Postres
+                Platillos
               </a>
             </li>
             <li class="text-center">
               <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(3)" 
               [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 3, 
               'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 3}">
+                Postres
+              </a>
+            </li>
+            <li class="text-center">
+              <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(4)" 
+              [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 4, 
+              'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 4}">
                 Bebidas
+              </a>
+            </li>
+            <li class="text-center">
+              <a class="inline-block p-4 rounded-t-lg" (click)="toggleTabs(5)" 
+              [ngClass]="{'hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300': openTab !== 5, 
+              'text-blue-600 bg-gray-100 dark:bg-gray-800 dark:text-white': openTab === 5}">
+                Bebidas Alcoholicas
               </a>
             </li>
         </ul>
         <!-- Tab Content -->
         <div class="relative flex flex-col min-w-0 break-words p-4 rounded-lg bg-gray-50 dark:bg-gray-800 w-full mb-6 shadow-lg px-4 py-5 flex-auto tab-content tab-space">
-            <!-- 'Platillos' Tab -->
+            <!-- 'Entradas' Tab -->
             <div [ngClass]="{'hidden': openTab !== 1, 'block': openTab === 1}" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                @for (i of tabSecc.divEnt; track i.index){
+                    <div class="grid gap-4">
+                        @for (j of i; track j.id){
+                            <div (click)="setDetailModal(j.ID)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg mx-auto" [src]="j.Imagen" alt="" /></a>
+                                <div class="p-5">
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.Nombre}}</h5>
+                                    
+                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.Descripcion}}</p>
+                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.Precio}}</p>
+            
+                                    <div *ngIf="edicion" class="flex flex-col items-center">
+                                        <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'+','menu')">add</button>
+                                            {{j.cantidad}}
+                                            <button class="material-symbols-outlined" (click)="itemMod(j,'-','menu')">remove</button>
+                                        </div>
+                                        <button (click)="addItem(j)" type="button" class="mt-2 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Agregar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+            <!-- 'Platillos' Tab -->
+            <div [ngClass]="{'hidden': openTab !== 2, 'block': openTab === 2}" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @for (i of tabSecc.divPla; track i.index){
                     <div class="grid gap-4">
                         @for (j of i; track j.id){
-                            <div (click)="setDetailModal(j.id)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg" [src]="j.imagen" alt="" /></a>
+                            <div (click)="setDetailModal(j.ID)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg mx-auto" [src]="j.Imagen" alt="" /></a>
                                 <div class="p-5">
-                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.nombre}}</h5>
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.Nombre}}</h5>
                                     
-                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.descripcion}}</p>
-                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.precio}}</p>
+                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.Descripcion}}</p>
+                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.Precio}}</p>
             
                                     <div *ngIf="edicion" class="flex flex-col items-center">
                                         <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
@@ -73,17 +112,17 @@
                 }
             </div>
             <!-- 'Postres' Tab -->
-            <div [ngClass]="{'hidden': openTab !== 2, 'block': openTab === 2}"class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div [ngClass]="{'hidden': openTab !== 3, 'block': openTab === 3}"class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @for (i of tabSecc.divPos; track i.index){
                     <div class="grid gap-4">
                         @for (j of i; track j.id){
-                            <div (click)="setDetailModal(j.id)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg" [src]="j.imagen" alt="" /></a>
+                            <div (click)="setDetailModal(j.ID)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg mx-auto" [src]="j.Imagen" alt="" /></a>
                                 <div class="p-5">
-                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.nombre}}</h5>
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.Nombre}}</h5>
                                     
-                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.descripcion}}</p>
-                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.precio}}</p>
+                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.Descripcion}}</p>
+                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.Precio}}</p>
             
                                     <div *ngIf="edicion" class="flex flex-col items-center">
                                         <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
@@ -100,17 +139,17 @@
                 }
             </div>
             <!-- 'Bebidas' Tab -->
-            <div [ngClass]="{'hidden': openTab !== 3, 'block': openTab === 3}"class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div [ngClass]="{'hidden': openTab !== 4, 'block': openTab === 4}"class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @for (i of tabSecc.divBeb; track i.index){
                     <div class="grid gap-4">
                         @for (j of i; track j.id){
-                            <div (click)="setDetailModal(j.id)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg" [src]="j.imagen" alt="" /></a>
+                            <div (click)="setDetailModal(j.ID)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                                <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg mx-auto" [src]="j.Imagen" alt="" /></a>
                                 <div class="p-5">
-                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.nombre}}</h5>
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.Nombre}}</h5>
                                     
-                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.descripcion}}</p>
-                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.precio}}</p>
+                                    <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.Descripcion}}</p>
+                                    <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.Precio}}</p>
             
                                     <div *ngIf="edicion" class="flex flex-col items-center">
                                         <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
@@ -126,6 +165,33 @@
                     </div>
                 }
           </div>
+          <!-- 'Bebidas Alcoholicas' Tab -->
+          <div [ngClass]="{'hidden': openTab !== 5, 'block': openTab === 5}"class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              @for (i of tabSecc.divAlc; track i.index){
+                  <div class="grid gap-4">
+                      @for (j of i; track j.id){
+                          <div (click)="setDetailModal(j.ID)" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                              <a (click)="detailsModal = !detailsModal"><img class="rounded-t-lg mx-auto" [src]="j.Imagen" alt="" /></a>
+                              <div class="p-5">
+                                  <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{j.Nombre}}</h5>
+                                  
+                                  <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{j.Descripcion}}</p>
+                                  <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{j.Precio}}</p>
+          
+                                  <div *ngIf="edicion" class="flex flex-col items-center">
+                                      <div class="rounded-full w-3/5 text-center flex justify-between items-center bg-white">
+                                          <button class="material-symbols-outlined" (click)="itemMod(j,'+','menu')">add</button>
+                                          {{j.cantidad}}
+                                          <button class="material-symbols-outlined" (click)="itemMod(j,'-','menu')">remove</button>
+                                      </div>
+                                      <button (click)="addItem(j)" type="button" class="mt-2 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">Agregar</button>
+                                  </div>
+                              </div>
+                          </div>
+                      }
+                  </div>
+              }
+        </div>
         </div>
     </div>
   </div>
@@ -156,10 +222,10 @@
                                 <button title="Aumentar" class="material-symbols-outlined" (click)="itemMod(i,'+','note')"> arrow_drop_up </button>
                                 <button title="Disminuir" class="material-symbols-outlined" (click)="itemMod(i,'-','note')"> arrow_drop_down  </button>
                             </div>
-                            <p><span class="pr-2">{{i.cantidad}}</span>{{i.nombre}}</p>
+                            <p><span class="pr-2">{{i.cantidad}}</span>{{i.Nombre}}</p>
                         </div>
                         <div class="flex items-center">
-                            <p>${{i.precio*i.cantidad}}.00</p>
+                            <p>${{i.Precio*i.cantidad}}.00</p>
                             <button title="Eliminar" *ngIf="noteEdit" (click)="removeItem(i)" class="material-symbols-outlined ml-2">delete</button>
                         </div>
                     </div>
@@ -182,13 +248,14 @@
         <div class="mx-auto max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
             <div class="relative">
                 <button class="material-symbols-outlined absolute text-black right-0 text-5xl closeBtn" (click)="detailsModal = !detailsModal"> close</button>
-                <img class="rounded-t-lg" [src]="d.imagen" alt="" />
+                <img class="rounded-t-lg mx-auto" [src]="d.Imagen" alt="" />
             </div>
             <div class="p-5">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{d.nombre}}</h5>
-                
-                <p class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{d.receta}}</p>
-                <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{d.precio}}</p>
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{d.Nombre}}</h5>
+                @for (i of d.receta; track i){
+                    <li class="mb-3 font-normal text-justify text-gray-700 dark:text-gray-400">{{i}}</li>
+                }
+                <p class="mb-3 font-normal text-right text-gray-700 dark:text-gray-300">${{d.Precio}}</p>
             </div>
         </div>
     </div>

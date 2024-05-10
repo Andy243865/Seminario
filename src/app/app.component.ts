@@ -2,6 +2,8 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLinkWithHref, RouterOutlet } from '@angular/router';
 import { Collapse, CollapseInterface, CollapseOptions, InstanceOptions, initFlowbite } from 'flowbite';
 import { CommonModule, Location, NgFor } from '@angular/common';
+import { DbserviceService } from './dbservice.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +11,7 @@ import { CommonModule, Location, NgFor } from '@angular/common';
   imports: [
     RouterOutlet,
     RouterLinkWithHref,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -22,7 +24,7 @@ export class AppComponent {
   //pedidoChk:boolean = false;
   tipoPedido:string = ''; 
 
-  constructor(private route: Router, private location: Location) {
+  constructor(private route: Router, private location: Location){
     /*if(location.path() == '/cocina'){
       this.pedidoChk = 4;
       this.tipoPedido = 'cocina';
