@@ -41,7 +41,9 @@ export class AppComponent {
   }
   
   ngAfterContentChecked(){
-    if(this.location.path() == '/cocina'){
+    if(this.location.path() == '/mesas'){
+      this.pedidoChk = 5;
+    }else if(this.location.path() == '/cocina'){
       this.pedidoChk = 4;
       this.tipoPedido = 'cocina';
     }else if(this.location.path() == '/barra'){
@@ -51,7 +53,7 @@ export class AppComponent {
       this.pedidoChk = 3;
     }else if(this.location.path() == '/crud'){
       this.pedidoChk = 2;
-    }else{
+    }else {
       this.pedidoChk = 1;
     }
   }

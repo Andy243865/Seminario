@@ -27,6 +27,11 @@
             </a>
           </li>
           <li>
+            <a routerLink="mesas" (click)="pedidoChk = 5"
+              [ngClass]="pedidoChk !== 5 ? 'text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-slate-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-slate-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent' : 'text-white bg-slate-700 rounded md:bg-transparent md:text-slate-700 md:p-0 md:dark:text-slate-500 dark:bg-slate-600 md:dark:bg-transparent underline decoration-slate-500'"
+              class="block py-2 px-3" aria-current="page">Mesas</a>
+          </li>
+          <li>
             <a routerLink="menu" (click)="pedidoChk = 3"
               [ngClass]="pedidoChk !== 3 ? 'text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-slate-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-slate-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent' : 'text-white bg-slate-700 rounded md:bg-transparent md:text-slate-700 md:p-0 md:dark:text-slate-500 dark:bg-slate-600 md:dark:bg-transparent underline decoration-slate-500'"
               class="block py-2 px-3" aria-current="page">Menú</a>
